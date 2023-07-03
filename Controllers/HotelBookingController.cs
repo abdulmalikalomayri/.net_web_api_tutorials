@@ -3,122 +3,86 @@ using Microsoft.AspNetCore.Mvc;
 using simpleapi.Models;
 using simpleapi.Data;
 
-
 namespace simpleapi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class HotelBookingController : ControllerBase
     {
+        /** 
+         *  Once you use a async function then every thing should be async  
+         **/
+
         // these two func are the default for DbContext 
         // Depency Injection in the constructor 
         private readonly ApiContext _context;
 
+        // using constructor we inject the DataContext
         public HotelBookingController(ApiContext context)
         {
             _context = context;
         }
 
-        /**
-         * @method POST
-         * Store and Update!
-         **/
-        [HttpPost]
-        public JsonResult CreateEdit(HotelBooking booking)
-        {
-            // if Booking are id Not exsist in DB Add booking
-            if (booking.Id == 0)
-            {
-                _context.Bookings.Add(booking);
-
-            }
-            // if Booking ID Exsist 
-            else
-            {
-                var bookingInDb = _context.Bookings.Find(booking.Id);
-
-                if (bookingInDb == null)
-                {
-                    return new JsonResult(NotFound());
-                }
-
-                // update booking
-                bookingInDb = booking;
-            }
-
-            // always save changes of the Database Mulipating 
-            // it's like Model.save(); in Laravel 
-            _context.SaveChanges();
-
-            return new JsonResult(Ok(booking));
-        }
-
-        /***
-         * @method GET
-         * @Description get user by ID from Database 
-         **/
-        [HttpGet]
-        public JsonResult GetById(int id)
-        {
-
-            var booking = _context.Bookings.Find(id);
-
-            if (booking == null)
-            {
-                return new JsonResult(NotFound(booking));
-            }
-
-            return new JsonResult(Ok(booking));
-        }
-
-        [HttpGet]
-        public JsonResult Get(int id)
-        {
-          
-
-            return new JsonResult(Ok());
-        }
-
-        /*
-        [HttpPut]
-        public JsonResult Put(int id, HotelBooking booking)
-        {
-            var book = _context.Bookings.Find(id);
-
-
-            return Ok(Put(id));
-        }
-        */
-        
-        /*
         [HttpGet]
         public async Task<ActionResult<List<HotelBooking>>> Get()
         {
-            return Ok();
+            return Ok(await _context.Bookings.ToListAsync());
         }
-        */
 
-        /***
-         * @method Delete
-         * @Description Delete a booking from Database 
-         **/
-        [HttpDelete]
-        public JsonResult Delete(int id)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<List<HotelBooking>>> Get(int id)
         {
-            var booking = _context.Bookings.Find(id);
-
-            if(booking == null)
+            var book = await _context.Bookings.FindAsync(id);
+            if(book == null)
             {
-                return new JsonResult(NotFound(booking));
+                return BadRequest("Booking not foound!");
+            }
+
+            return Ok(book);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<List<HotelBooking>>> Add(HotelBooking booking)
+        {
+            _context.Bookings.Add(booking);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(await _context.Bookings.ToListAsync());
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<List<HotelBooking>>> Update(HotelBooking request)
+        {
+            var dbBooking = await _context.Bookings.FindAsync(request.Id);
+            if(dbBooking == null)
+            {
+                return BadRequest("Booking not found!");
+            }
+
+            dbBooking.RoomNumber = request.RoomNumber;
+            dbBooking.Client = request.Client;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(await _context.Bookings.ToListAsync());
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult<List<HotelBooking>>> Delete(int id)
+        {
+            var booking = await _context.Bookings.FindAsync(id);
+            if(booking == null )
+            {
+                return BadRequest("Booking not found!");
             }
 
             _context.Bookings.Remove(booking);
+            await _context.SaveChangesAsync();
 
-            // for every DML query I must write this code to Save Changes!
-            _context.SaveChanges();
+            return Ok(await _context.Bookings.ToListAsync());
 
-            // return new JsonResult(NoContent());
-            return new JsonResult(Ok("Deleted!"));
         }
+        
     }
 }
