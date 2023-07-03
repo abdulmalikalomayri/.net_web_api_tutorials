@@ -3,6 +3,11 @@ global using simpleapi.Data;
 
 global using Microsoft.EntityFrameworkCore;
 
+// I make 
+global using simpleapi.Services.EmailService;
+global using simpleapi.Models;
+
+
 // add Model/HotelBooking namespace 
 
 
@@ -16,7 +21,10 @@ builder.Services.AddDbContext<ApiContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
- 
+
+
+// Register a service for SMTP
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
