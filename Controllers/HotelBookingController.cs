@@ -15,10 +15,10 @@ namespace simpleapi.Controllers
 
         // these two func are the default for DbContext 
         // Depency Injection in the constructor 
-        private readonly ApiContext _context;
+        private readonly DataContext _context;
 
         // using constructor we inject the DataContext
-        public HotelBookingController(ApiContext context)
+        public HotelBookingController(DataContext context)
         {
             _context = context;
         }
