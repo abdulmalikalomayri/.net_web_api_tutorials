@@ -17,6 +17,12 @@ namespace simpleapi.Controllers
             _context = context;
         }
 
+
+        /***
+         * Register a user 
+         * No Auth 
+         * @method POST
+         **/
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegisterRequest request)
         {

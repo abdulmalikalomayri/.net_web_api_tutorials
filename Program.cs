@@ -17,7 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddDbContext<DataContext>(
 //  opt => opt.UseInMemoryDatabase("BookingDb"));
 
-// Connection to SQL Server
+// There're two ways to Connection to SQL Server
+// Connection to SQL Server Number 1
 /*
 builder.Services.AddDbContext<DataContext>(options =>
 {
@@ -25,6 +26,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 });
 */
 
+// Connection to SQL Server Number 2
 // Connection SQL Server when the connection string in the DataContext instead of Program.cs
 builder.Services.AddDbContext<DataContext>();
 
