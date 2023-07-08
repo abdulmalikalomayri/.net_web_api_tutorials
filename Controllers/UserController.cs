@@ -129,5 +129,49 @@ namespace simpleapi.Controllers
             return Ok("User verified! :)");
         }
 
+        /**_________________________________________________*/
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            // check if user exsist 
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if(user == null)
+            {
+                return BadRequest("User not found");
+            }
+
+            user.PasswordResetToken = CreateRandomToken();
+            // expre in 1 day
+            user.ResetTokenExpires = DateTime.Now.AddDays(1);
+            // database save changes
+            await _context.SaveChangesAsync();
+
+            return Ok("You can reset your password now!");
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResettPassword(ResetPasswordRequest request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == request.Token);
+            if (user == null || user.ResetTokenExpires < DateTime.Now)
+            {
+                return BadRequest("Invalid Token.");
+            }
+
+            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.PasswordResetToken = null;
+            user.ResetTokenExpires = null;
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Password successfully reset.");
+        }
+
+
     }
+
+
 }
