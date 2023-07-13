@@ -49,6 +49,8 @@ namespace simpleapi.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
+            // Send email for verifiction 
+
             return Ok("User Successful created!");
         }
 

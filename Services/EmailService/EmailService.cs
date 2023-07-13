@@ -21,8 +21,8 @@ namespace simpleapi.Services.EmailService
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(_config.GetSection("EmailUsername").Value));
             email.To.Add(MailboxAddress.Parse(request.To));
-            email.Subject = request.Subject;
-            email.Body = new TextPart(TextFormat.Html) { Text = request.Body};
+            email.Subject = "Token papa boy";
+            email.Body = new TextPart(TextFormat.Html) { Text = "كس ام حياتي"};
 
             // SMTP Information and Connection
             using var smtp = new SmtpClient();
