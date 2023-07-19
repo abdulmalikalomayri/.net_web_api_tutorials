@@ -6,6 +6,9 @@ global using Microsoft.EntityFrameworkCore;
 // I make 
 global using simpleapi.Services.EmailService;
 global using simpleapi.Models;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 
 // add Model/HotelBooking namespace 
@@ -37,6 +40,21 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Enable JWT Bearer Toekn 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        // definding the type of token 
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            // using a key for validation options
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
+
 var app = builder.Build();
 
 
@@ -46,6 +64,7 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+// add auth middlware this line should be above the MapContoroller
 app.UseAuthorization();
 
 app.MapControllers();
