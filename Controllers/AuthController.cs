@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using simpleapi.Dto;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.ConstrainedExecution;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
@@ -14,13 +15,19 @@ namespace simpleapi.Controllers
     {
 
         public static User user = new User();
+        // for JWT Token
         private static IConfiguration _configuration;
+        // private final attirbute 
+        private readonly DataContext _context;
 
-        public AuthController(IConfiguration configuration)
+        public AuthController(IConfiguration configuration, DataContext context)
         {
             _configuration = configuration;
+            _context = context;
         }
 
+
+        /*
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(UserDto request)
         {
@@ -30,17 +37,46 @@ namespace simpleapi.Controllers
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
+        
+
+            return Ok(user);
+        }
+         
+         * return Task<IActionResult>
+         **/
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(UserDto request)
+        {
+            // validate request 
+
+            // hashing password 
+            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            // store request + password in user object
+            var user = new User
+            {
+                Username = request.Username,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+                VerificationToken = CreateRandomToken()
+            };
+
+            // save object in to the Database 
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+
             return Ok(user);
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(UserDto request)
         {
-            if (user.Username != request.Username)
-            {
-                return BadRequest("User not found.");
-            }
+            Console.WriteLine(request.Username);
 
+             
+
+            // Check if the user password is 
             if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
             {
                 return BadRequest("Wrong password.");
@@ -108,6 +144,15 @@ namespace simpleapi.Controllers
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
+        }
+
+        /**
+         * Create a Hash Token 
+         * Hash token use for authenticate the user request in verify email and in request reset password
+         * */
+        private string CreateRandomToken()
+        {
+            return Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
         }
     }
 }
