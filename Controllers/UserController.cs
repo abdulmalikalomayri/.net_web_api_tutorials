@@ -49,6 +49,7 @@ namespace simpleapi.Controllers
             var user = new User
             {
                 Username = request.Username,
+                Email = request.Email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
                 VerificationToken = CreateRandomToken()
@@ -195,7 +196,7 @@ namespace simpleapi.Controllers
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.Now.AddDays(30),
                 signingCredentials: creds);
 
             // createing jwt token from the above information
