@@ -82,6 +82,7 @@ namespace simpleapi.Controllers
                 return BadRequest("Wrong password.");
             }
 
+            // create a jwt token 
             string token = CreateToken(user);
 
             // var refreshToken = GenerateRefreshToken();
@@ -106,6 +107,11 @@ namespace simpleapi.Controllers
             }
         }
 
+        /**
+         * @reting string 
+         * get payload and it will return a jwt token
+         * 
+         **/
         private string CreateToken(User user)
         {
             List<Claim> claims = new List<Claim>
