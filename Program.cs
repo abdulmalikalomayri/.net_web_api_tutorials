@@ -14,6 +14,12 @@ using System.Text;
 // add Model/HotelBooking namespace 
 
 
+/*******
+ * Creat 
+ * 
+ ******/
+
+// this line is like a public static void main(array args[])
 var builder = WebApplication.CreateBuilder(args);
 
 // below code to test the api crud without real database it use inMemoryDatabase which is for test only
@@ -28,6 +34,11 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 */
+
+/*******
+ * Build 
+ * 
+ ******/
 
 // Connection to SQL Server Number 2
 // Connection SQL Server when the connection string in the DataContext instead of Program.cs
@@ -55,8 +66,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+
+
+/*******
+ * Run 
+ * 
+ ******/
+
 var app = builder.Build();
 
+// middlware and endpoint
+app.MapGet("/", () => "Hello World");
 
 app.UseSwagger();
 app.UseSwaggerUI();
