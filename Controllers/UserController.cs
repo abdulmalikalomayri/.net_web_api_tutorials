@@ -96,6 +96,7 @@ namespace simpleapi.Controllers
 
             // create a token using a private method "CreateToken"
             string token = CreateToken(user);
+            
 
             return Ok(token);
         }

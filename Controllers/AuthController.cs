@@ -45,26 +45,13 @@ namespace simpleapi.Controllers
          * return Task<IActionResult>
          **/
         [HttpPost("register")]
-        public async Task<IActionResult> Register(UserDto request)
+        public async Task<ActionResult<User>> Register(UserDto request)
         {
-            // validate request 
-
-            // hashing password 
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            // store request + password in user object
-            var user = new User
-            {
-                Username = request.Username,
-                PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt,
-                VerificationToken = CreateRandomToken()
-            };
-
-            // save object in to the Database 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
+            user.Username = request.Username;
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
 
             return Ok(user);
         }
@@ -72,21 +59,19 @@ namespace simpleapi.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(UserDto request)
         {
-            Console.WriteLine(request.Username);
+            if (user.Username != request.Username)
+            {
+                return BadRequest("User not found.");
+            }
 
-             
-
-            // Check if the user password is 
             if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
             {
                 return BadRequest("Wrong password.");
             }
 
-            // create a jwt token 
             string token = CreateToken(user);
 
-            // var refreshToken = GenerateRefreshToken();
-            // SetRefreshToken(refreshToken);
+             
 
             return Ok(token);
         }
