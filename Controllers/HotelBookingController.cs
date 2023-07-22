@@ -2,11 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using simpleapi.Models;
 using simpleapi.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace simpleapi.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController, Authorize]
     public class HotelBookingController : ControllerBase
     {
         /** 
@@ -30,6 +31,7 @@ namespace simpleapi.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<HotelBooking>>> Get(int id)
         {
             var book = await _context.Bookings.FindAsync(id);

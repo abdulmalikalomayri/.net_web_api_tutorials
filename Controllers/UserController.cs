@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace simpleapi.Controllers
@@ -12,10 +14,16 @@ namespace simpleapi.Controllers
 
         // here I create a attraibute and set a setter method 
         private readonly DataContext _context;
+
+        // configuration for the JWT Token 
+        private IConfiguration _configuration;
+
         // from This we can call any table using _context
-        public UserController(DataContext context)
+        public UserController(DataContext context, IConfiguration configuration)
         {
+
             _context = context;
+            _configuration = configuration;
         }
 
         /**_________________________________________________*/
@@ -27,8 +35,9 @@ namespace simpleapi.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegisterRequest request)
         {
+
             // check if the user 
-            if (_context.Users.Any(u => u.Email == request.Email))
+            if (_context.Users.Any(u => u.Username == request.Username))
             {
                 return BadRequest("User already exists.");
             }
@@ -39,6 +48,7 @@ namespace simpleapi.Controllers
 
             var user = new User
             {
+                Username = request.Username,
                 Email = request.Email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
@@ -51,19 +61,20 @@ namespace simpleapi.Controllers
 
             // Send email for verifiction 
 
-            return Ok("User Successful created!");
+            return Ok(user);
         }
 
 
         /**
          * Login a user
          * @method POST
+         * UserLoginRequest used for entring the input in the swagger
          **/
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginRequest request)
         {
             // Check if the user with that email exsist  
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
             if (user == null)
             {
                 return BadRequest("User not found.");
@@ -75,14 +86,19 @@ namespace simpleapi.Controllers
                 return BadRequest("Password is incorrect.");
             }
 
+            /*
             // Check if the user verified or not
             if (user.VerifiedAt == null)
             {
                 return BadRequest("Not verified!");
             }
+            */
 
+            // create a token using a private method "CreateToken"
+            string token = CreateToken(user);
+            
 
-            return Ok($"Welcome back, {user.Email}! :)");
+            return Ok(token);
         }
 
         
@@ -160,6 +176,35 @@ namespace simpleapi.Controllers
 
         /**____________________( Helper Function )________________________*/
 
+        /**
+         * Create a JWT token for login 
+         * 
+         **/
+        private string CreateToken(User user)
+        {
+            
+
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Username)
+            };
+
+            // create JWT Symmetric key = public key which is only one key
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+
+            // selecting the security algorithms 
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddDays(30),
+                signingCredentials: creds);
+
+            // createing jwt token from the above information
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
+        }
         /**
          * Password Hashing 
          * Use in Register & Reset Password 
