@@ -12,8 +12,8 @@ using simpleapi.Data;
 namespace simpleapi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230718215047_init")]
-    partial class init
+    [Migration("20230722192847_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -68,6 +68,10 @@ namespace simpleapi.Migrations
 
                     b.Property<DateTime?>("ResetTokenExpires")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Username")
                         .IsRequired()

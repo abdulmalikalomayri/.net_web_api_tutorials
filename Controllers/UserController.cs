@@ -50,6 +50,7 @@ namespace simpleapi.Controllers
             {
                 Username = request.Username,
                 Email = request.Email,
+                Role = "User",
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
                 VerificationToken = CreateRandomToken()
@@ -97,7 +98,9 @@ namespace simpleapi.Controllers
             // create a token using a private method "CreateToken"
             string token = CreateToken(user);
             
-
+            // store token in DB
+            // store refresh token in DB
+            
             return Ok(token);
         }
 
@@ -186,7 +189,9 @@ namespace simpleapi.Controllers
 
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Username)
+                new Claim(ClaimTypes.Name, user.Username),
+                // add a role within the JWT Token.
+                new Claim(ClaimTypes.Role, user.Role)
             };
 
             // create JWT Symmetric key = public key which is only one key

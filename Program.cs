@@ -24,16 +24,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 // There're two ways to Connection to SQL Server
 // Connection to SQL Server Number 1
-/*
+
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-*/
+
 
 // Connection to SQL Server Number 2
 // Connection SQL Server when the connection string in the DataContext instead of Program.cs
-builder.Services.AddDbContext<DataContext>();
+// builder.Services.AddDbContext<DataContext>();
 
 // Register a service for SMTP
 builder.Services.AddScoped<IEmailService, EmailService>();

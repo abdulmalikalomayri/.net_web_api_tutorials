@@ -24,7 +24,7 @@ namespace simpleapi.Controllers
             _context = context;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize(Roles = "User")]
         public async Task<ActionResult<List<HotelBooking>>> Get()
         {
             return Ok(await _context.Bookings.ToListAsync());
@@ -43,7 +43,7 @@ namespace simpleapi.Controllers
             return Ok(book);
         }
 
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<HotelBooking>>> Add(HotelBooking booking)
         {
             _context.Bookings.Add(booking);
