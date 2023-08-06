@@ -8,6 +8,7 @@
 
         }
 
+        // override Polymorphism 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // I have comments it bcz I defined the connection string in program data istead of here 

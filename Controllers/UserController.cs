@@ -190,7 +190,7 @@ namespace simpleapi.Controllers
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Username),
-                // add a role within the JWT Token.
+                // add a role within the JWT Token. 
                 new Claim(ClaimTypes.Role, user.Role)
             };
 
