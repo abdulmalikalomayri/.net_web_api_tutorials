@@ -1,4 +1,5 @@
 global using Microsoft.EntityFrameworkCore;
+using simpleapi;
 using simpleapi.Data;
 
 
@@ -13,12 +14,31 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(connection);
 });
 
+// DI. 
+// AddTransient means add the service at the top 
+builder.Services.AddTransient<Seed>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// seeding. it will run before the app starts
+if (args.Length == 1 && args[0].ToLower() == "seeddata")
+    SeedData(app);
+
+void SeedData(IHost app)
+{
+    var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+
+    using (var scope = scopedFactory.CreateScope())
+    {
+        // Injection the service
+        var service = scope.ServiceProvider.GetService<Seed>();
+        service.SeedDataContext();
+    }
+}
 
 app.UseSwagger();
 app.UseSwaggerUI();
