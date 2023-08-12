@@ -4,6 +4,7 @@ using simpleapi.Data;
 using simpleapi.Interfaces;
 using simpleapi.Repository;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // setting for connecting to Database

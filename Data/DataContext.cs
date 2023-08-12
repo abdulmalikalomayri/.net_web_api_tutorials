@@ -35,5 +35,11 @@ namespace simpleapi.Data
             modelBuilder.Entity<PokemonOwner>().HasOne(p => p.Pokemon).WithMany(po => po.PokemonOwners).HasForeignKey(c => c.OwnerId);
         }
 
+<<<<<<< HEAD
+=======
+        // if we run migrations it will take below classes and make them as DB tables 
+        public DbSet<HotelBooking> Bookings { get; set; }
+        public DbSet<User> Users => Set<User>();
+>>>>>>> f6f6601b347329a744228e8c0fc7a69f5cd153e2
     }
 }
