@@ -1,8 +1,8 @@
 global using Microsoft.EntityFrameworkCore;
 using simpleapi;
 using simpleapi.Data;
-
-
+using simpleapi.Interfaces;
+using simpleapi.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +17,9 @@ builder.Services.AddDbContext<DataContext>(options =>
 // DI. 
 // AddTransient means add the service at the top 
 builder.Services.AddTransient<Seed>();
+
+// we need to tell the DotNet that we use Depency Injection in Program.cs
+builder.Services.AddScoped<IPokemonRepository, PokemonRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
