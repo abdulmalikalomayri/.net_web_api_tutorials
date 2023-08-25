@@ -8,15 +8,12 @@ global using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// below code to test the api crud without real database it use inMemoryDatabase which is for test only
-//builder.Services.AddDbContext<ApiContext>(
-//  opt => opt.UseInMemoryDatabase("BookingDb"));
 
-builder.Services.AddDbContext<ApiContext>(options =>
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<DataContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(connectionString);
 });
- 
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
