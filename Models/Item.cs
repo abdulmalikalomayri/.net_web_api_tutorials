@@ -5,6 +5,6 @@
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Barcode { get; set; } = string.Empty;
-        public int qty { get; set; } = 0;
+        public int Qty { get; set; } = 0;
     }
 }
